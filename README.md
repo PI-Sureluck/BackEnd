@@ -24,7 +24,114 @@ O SureLuck é um projeto que visa criar uma plataforma de SureBets especializada
 
 A API do SureLuck oferece diversos endpoints que permitem interagir com a plataforma, obter informações sobre as apostas, e muito mais. Abaixo estão os principais endpoints e suas funcionalidades:
 
-## User EndPoints
+## Sites EndPoints
+
+--- 
+### `GET /sites/site/`  retorna todos os sites
+
+Este endpoint retorna informações sobre todos os sites específicos na plataforma.
+
+#### Requisição
+- Método: GET
+  - Endpoint: `/sites/site/`
+
+#### Exemplo de Resposta
+```json
+{
+  {
+    "id": 1,
+    "name": "site",
+    "link": "site.com.br",
+    "logo": "",
+    "xpath": ""
+  }
+  {
+    "id": 2,
+    "name": "site2",
+    "link": "site2.com.br",
+    "logo": "",
+    "xpath": ""
+  }
+}
+
+```
+---
+
+### `GET /sites/site/id`  retorna apenas um site
+
+Este endpoint retorna informações sobre um site específico na plataforma.
+
+#### Requisição
+- Método: GET
+  - Endpoint: `/sites/site/id`
+
+#### Exemplo de Resposta
+```json
+{
+  "id": 1,
+  "name": "site",
+  "link": "site.com.br",
+  "logo": "",
+  "xpath": ""
+}
+
+```
+---
+
+### `POST /sites/site/` Cadastra um site
+
+Este endpoint cadastra um site na plataforma.
+
+#### Requisição
+- Método: POST
+  - Endpoint: `/sites/site/`
+
+#### Parâmetros esperados 
+```json
+{
+  "id": 1,
+  "name": "site",
+  "link": "site.com.br",
+  "logo": "",
+  "xpath": ""
+}
+```
+---
+
+### `PUT /sites/site/id` Edita um site
+
+Este endpoint edita um site específico na plataforma.
+
+#### Requisição
+- Método: PUT
+  - Endpoint: `/sites/site/id`
+
+#### Parâmetros esperados 
+```json
+{
+  "id": 1,
+  "name": "site",
+  "link": "site.com.br",
+  "logo": "",
+  "xpath": ""
+}
+```
+OBS: caso queira alterar apenas um item pode passar os outros com o parâmetro vazio 
+
+---
+
+### `DELETE /sites/site/id` Deleta um site
+
+Este endpoint deleta um site específico na plataforma.
+
+#### Requisição
+- Método: DELETE
+  - Endpoint: `/sites/site/id`
+
+---
+
+
+## Users EndPoints
 
 --- 
 ### `GET /users/user/`  retorna todos os usuários
@@ -121,6 +228,7 @@ Este endpoint deleta um usuário específico na plataforma.
   - Endpoint: `/users/user/id`
 
 ---
+
 
 ## Aviso Legal
 
