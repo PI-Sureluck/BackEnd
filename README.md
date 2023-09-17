@@ -24,16 +24,65 @@ O SureLuck é um projeto que visa criar uma plataforma de SureBets especializada
 
 A API do SureLuck oferece diversos endpoints que permitem interagir com a plataforma, obter informações sobre as apostas, e muito mais. Abaixo estão os principais endpoints e suas funcionalidades:
 
-### `GET /users/user` 
+## User EndPoints
 
-Este endpoint retorna informações sobre todos os usuário específico na plataforma.
+--- 
+### `GET /users/user/`  retorna todos os usuários
+
+Este endpoint retorna informações sobre todos os usuários específicos na plataforma.
 
 #### Requisição
-
 - Método: GET
-- Endpoint: `/users/user`
+  - Endpoint: `/users/user/`
 
 #### Exemplo de Resposta
+```json
+{
+    {
+      "id": 123,
+      "username": "teste123",
+      "email": "teste123@example.com"
+    }
+    {
+      "id": 123,
+      "username": "teste123",
+      "email": "teste123@example.com"
+    }
+}
+
+```
+---
+
+### `GET /users/user/id`  retorna apenas um usuário
+
+Este endpoint retorna informações sobre um usuário específico na plataforma.
+
+#### Requisição
+- Método: GET
+  - Endpoint: `/users/user/id`
+
+#### Exemplo de Resposta
+```json
+
+{
+  "id": 123,
+  "username": "teste123",
+  "email": "teste123@example.com"
+}
+
+
+```
+---
+
+### `POST /users/user/` Cadastra um usuário
+
+Este endpoint cadastra o usuário na plataforma.
+
+#### Requisição
+- Método: POST
+  - Endpoint: `/users/user/`
+
+#### Parâmetros esperados 
 ```json
 {
   "id": 123,
@@ -41,7 +90,37 @@ Este endpoint retorna informações sobre todos os usuário específico na plata
   "email": "teste123@example.com"
 }
 ```
+---
 
+### `PUT /users/user/id` Edita um usuário
+
+Este endpoint edita um usuário específico na plataforma.
+
+#### Requisição
+- Método: PUT
+  - Endpoint: `/users/user/id`
+
+#### Parâmetros esperados 
+```json
+{
+  "id": 123,
+  "username": "teste123",
+  "email": "teste123@example.com"
+}
+```
+OBS: caso queira alterar apenas um item pode passar os outros com o parâmetro vazio 
+
+---
+
+### `DELETE /users/user/id` Deleta um usuário
+
+Este endpoint deleta um usuário específico na plataforma.
+
+#### Requisição
+- Método: DELETE
+  - Endpoint: `/users/user/id`
+
+---
 
 ## Aviso Legal
 
