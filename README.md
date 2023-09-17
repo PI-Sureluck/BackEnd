@@ -24,9 +24,23 @@ O SureLuck é um projeto que visa criar uma plataforma de SureBets especializada
 
 A API do SureLuck oferece diversos endpoints que permitem interagir com a plataforma, obter informações sobre as apostas, e muito mais. Abaixo estão os principais endpoints e suas funcionalidades:
 
-### `GET /api/eventos` (Exemplo )
+### `GET /users/user` 
 
-Este endpoint retorna uma lista de eventos esportivos disponíveis para apostas.
+Este endpoint retorna informações sobre todos os usuário específico na plataforma.
+
+#### Requisição
+
+- Método: GET
+- Endpoint: `/users/user`
+
+#### Exemplo de Resposta
+```json
+{
+  "id": 123,
+  "username": "teste123",
+  "email": "teste123@example.com"
+}
+```
 
 
 ## Aviso Legal
