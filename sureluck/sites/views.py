@@ -136,3 +136,64 @@ class EventView(View):
 
         return JsonResponse(data)
 
+class OddsView(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, id=0):
+        if (id > 0):
+            odd = list(Odds.objects.filter(id=id).values())
+            if (len(odd) > 0):
+                data = {'status': 200, 'message': 'Odds encontrado', 'odd': odd}
+            else:
+                data = {'status': 404, 'message': 'não foi possivel encontrar o odd'}
+        else:
+            odds = list(Odds.objects.values())
+            if (len(odds) > 0):
+                data = {'status': 200, 'message': 'Odds encontrados', 'odds': odds}
+            else:
+                data = {'status': 404, 'message': 'não foi possivel encontrar nenhuma odd'}
+        return JsonResponse(data)
+
+    def post(self, request):
+        # print(request.body)
+        jd = json.loads(request.body)
+        print(jd)
+        site = Site.objects.get(id=jd["site"])
+        evento = Event.objects.get(id=jd["event"])
+        Odds.objects.create(odd=jd['odd'], site=site, event=evento)
+        data = {'status': 200, 'message': 'Odd criado com sucesso'}
+        return JsonResponse(data)
+
+    def put(self, request, id):
+        jd = json.loads(request.body)
+        odds = list(Odds.objects.filter(id=id).values())
+
+        if (len(odds) > 0):
+            oddsedit = Odds.objects.get(id=id)
+            if (jd['odd'] != ""):
+                oddsedit.odd = jd['odd']
+            if (jd['site'] != ""):
+                site = Site.objects.get(id=jd["site"])
+                oddsedit.site = site
+            if (jd['event'] != ""):
+                evento = Event.objects.get(id=jd["event"])
+                oddsedit.event = evento
+
+            oddsedit.save()
+            data = {'status': 200, 'message': 'Odds editada com sucesso'}
+        else:
+            data = {'status': 404, 'message': 'não foi possivel encontrar a odd'}
+
+        return JsonResponse(data)
+
+    def delete(self, request, id):
+        odd = list(Odds.objects.filter(id=id).values())
+        if (len(odd) > 0):
+            Odds.objects.filter(id=id).delete()
+            data = {'status': 200, 'message': 'Odds deletado com sucesso'}
+        else:
+            data = {'status': 404, 'message': 'não foi possivel encontrar a odd'}
+
+        return JsonResponse(data)
