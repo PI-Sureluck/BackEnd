@@ -15,7 +15,7 @@ class Site(models.Model):
 
 class Event(models.Model):
     name = models.CharField(max_length=50)
-    data = models.DateField()
+    date = models.DateField()
     teamA = models.CharField(max_length=50)
     teamB = models.CharField(max_length=50)
 
