@@ -230,6 +230,120 @@ Este endpoint deleta um usuário específico na plataforma.
 ---
 
 
+## Events EndPoints
+
+--- 
+### `GET /sites/event/`  retorna todos os eventos
+
+Este endpoint retorna informações sobre todos os eventos específicos na plataforma.
+
+#### Requisição
+- Método: GET
+  - Endpoint: `/sites/event/`
+
+#### Exemplo de Resposta
+```json
+{
+	"status": 200,
+	"message": "Events encontrados",
+	"events": [
+		{
+			"id": 3,
+			"name": "teste152f0",
+			"date": "2023-09-20",
+			"teamA": "timeAaa",
+			"teamB": "timebbbb"
+		},
+		{
+			"id": 4,
+			"name": "eventofoda",
+			"date": "2023-10-20",
+			"teamA": "timeAaa",
+			"teamB": "timebbbb"
+		}
+	]
+}
+
+```
+---
+
+### `GET /sites/event/id`  retorna apenas um evento
+
+Este endpoint retorna informações sobre um evento específico na plataforma.
+
+#### Requisição
+- Método: GET
+  - Endpoint: `/sites/event/id`
+
+#### Exemplo de Resposta
+```json
+{
+	"status": 200,
+	"message": "Event encontrado",
+	"event": [
+		{
+			"id": 3,
+			"name": "teste152f0",
+			"date": "2023-09-20",
+			"teamA": "timeAaa",
+			"teamB": "timebbbb"
+		}
+	]
+}
+```
+---
+
+### `POST /sites/event/` Cadastra um evento
+
+Este endpoint cadastra um evento na plataforma.
+
+#### Requisição
+- Método: POST
+  - Endpoint: `/sites/event/`
+
+#### Parâmetros esperados 
+```json
+{
+  "name":"eventofoda",
+	"date":"2023-12-20",
+	"teamA":"timeAaa",
+	"teamB":"timebbbb"
+}
+```
+---
+
+### `PUT /sites/event/id` Edita um evento
+
+Este endpoint edita um evento específico na plataforma.
+
+#### Requisição
+- Método: PUT
+  - Endpoint: `/sites/event/id`
+
+#### Parâmetros esperados 
+```json
+{
+  "name":"eventofoda",
+	"date":"2023-12-20",
+	"teamA":"timeAaa",
+	"teamB":"timebbbb"
+}
+```
+OBS: caso queira alterar apenas um item pode passar os outros com o parâmetro vazio 
+
+---
+
+### `DELETE /sites/event/id` Deleta um evento
+
+Este endpoint deleta um evento específico na plataforma.
+
+#### Requisição
+- Método: DELETE
+  - Endpoint: `/sites/event/id`
+
+---
+
+
 ## Aviso Legal
 
 O SureLuck é um site que oferece informações e oportunidades de apostas em esportes eletrônicos (E-Sport). No entanto, é fundamental compreender que apostas envolvem riscos e, como tal, não podemos garantir lucro ou ausência de perdas.

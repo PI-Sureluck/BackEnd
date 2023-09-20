@@ -1,11 +1,14 @@
 import json
 
+from django.utils.dateparse import parse_date
+from rest_framework import viewsets
+
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import Site
+from .models import *
 
 
 # Create your views here.
@@ -35,7 +38,7 @@ class SiteView(View):
         # print(request.body)
         jd = json.loads(request.body)
         print(jd)
-        Site.objects.create(name=jd['name'], link=jd['link'], logo=jd['logo'],xpath=jd['xpath'])
+        Site.objects.create(name=jd['name'], link=jd['link'], logo=jd['logo'], xpath=jd['xpath'])
         data = {'status': 200, 'message': 'Site cadastrado com sucesso'}
         return JsonResponse(data)
 
@@ -67,6 +70,69 @@ class SiteView(View):
             data = {'status': 200, 'message': 'Site deletado com sucesso'}
         else:
             data = {'status': 404, 'message': 'não foi possivel encontrar o site'}
+
+        return JsonResponse(data)
+
+
+class EventView(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, id=0):
+        if (id > 0):
+            event = list(Event.objects.filter(id=id).values())
+            if (len(event) > 0):
+                data = {'status': 200, 'message': 'Event encontrado', 'event': event}
+            else:
+                data = {'status': 404, 'message': 'não foi possivel encontrar o event'}
+        else:
+            events = list(Event.objects.values())
+            if (len(events) > 0):
+                data = {'status': 200, 'message': 'Events encontrados', 'events': events}
+            else:
+                data = {'status': 404, 'message': 'não foi possivel encontrar nenhum event'}
+        return JsonResponse(data)
+
+    def post(self, request):
+        # print(request.body)
+        jd = json.loads(request.body)
+        print(jd)
+        data_evento_str = jd['date']
+        data_evento = parse_date(data_evento_str)
+        Event.objects.create(name=jd['name'], date=data_evento, teamA=jd['teamA'], teamB=jd['teamB'])
+        data = {'status': 200, 'message': 'Evento criado com sucesso'}
+        return JsonResponse(data)
+
+    def put(self, request, id):
+        jd = json.loads(request.body)
+        event = list(Event.objects.filter(id=id).values())
+        eventname = jd['name']
+        print("entrou no certo" + eventname)
+        if (len(event) > 0):
+            eventedit = Event.objects.get(id=id)
+            if (jd['name'] != ""):
+                eventedit.name = jd['name']
+            if (jd['teamA'] != ""):
+                eventedit.teamA = jd['teamA']
+            if (jd['teamB'] != ""):
+                eventedit.teamB = jd['teamB']
+            if (jd['date'] != ""):
+                eventedit.date = parse_date(jd['date'])
+            eventedit.save()
+            data = {'status': 200, 'message': 'Evento ' + eventname + ' editado com sucesso'}
+        else:
+            data = {'status': 404, 'message': 'não foi possivel encontrar o evento'}
+
+        return JsonResponse(data)
+
+    def delete(self, request, id):
+        evento = list(Event.objects.filter(id=id).values())
+        if (len(evento) > 0):
+            Event.objects.filter(id=id).delete()
+            data = {'status': 200, 'message': 'Evento deletado com sucesso'}
+        else:
+            data = {'status': 404, 'message': 'não foi possivel encontrar o evento'}
 
         return JsonResponse(data)
 
