@@ -33,7 +33,7 @@ class SureBets(models.Model):
     teamB = models.CharField(max_length=50)
     oddA = models.FloatField()
     oddB = models.FloatField()
-    Profit = models.FloatField()
+    profit = models.FloatField()
     site = models.ManyToManyField(Site, related_name="sites")
     event = models.ManyToManyField(Event, related_name="events")
 
