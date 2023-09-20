@@ -89,7 +89,6 @@ Este endpoint cadastra um site na plataforma.
 #### Parâmetros esperados 
 ```json
 {
-  "id": 1,
   "name": "site",
   "link": "site.com.br",
   "logo": "",
@@ -109,7 +108,6 @@ Este endpoint edita um site específico na plataforma.
 #### Parâmetros esperados 
 ```json
 {
-  "id": 1,
   "name": "site",
   "link": "site.com.br",
   "logo": "",
@@ -192,9 +190,9 @@ Este endpoint cadastra o usuário na plataforma.
 #### Parâmetros esperados 
 ```json
 {
-  "id": 123,
   "username": "teste123",
-  "email": "teste123@example.com"
+  "email": "teste123@example.com",
+  "password": "senha"
 }
 ```
 ---
@@ -210,9 +208,9 @@ Este endpoint edita um usuário específico na plataforma.
 #### Parâmetros esperados 
 ```json
 {
-  "id": 123,
   "username": "teste123",
   "email": "teste123@example.com"
+  "password": "senha"
 }
 ```
 OBS: caso queira alterar apenas um item pode passar os outros com o parâmetro vazio 
@@ -305,9 +303,9 @@ Este endpoint cadastra um evento na plataforma.
 ```json
 {
   "name":"eventofoda",
-	"date":"2023-12-20",
-	"teamA":"timeAaa",
-	"teamB":"timebbbb"
+  "date":"2023-12-20",
+  "teamA":"timeAaa",
+  "teamB":"timebbbb"
 }
 ```
 ---
@@ -324,9 +322,9 @@ Este endpoint edita um evento específico na plataforma.
 ```json
 {
   "name":"eventofoda",
-	"date":"2023-12-20",
-	"teamA":"timeAaa",
-	"teamB":"timebbbb"
+  "date":"2023-12-20",
+  "teamA":"timeAaa",
+  "teamB":"timebbbb"
 }
 ```
 OBS: caso queira alterar apenas um item pode passar os outros com o parâmetro vazio 
