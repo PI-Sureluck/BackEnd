@@ -32,7 +32,7 @@ class UserView(View):
         return JsonResponse(data)
 
     def post(self, request):
-        # print(request.body)
+        print(request.body)
         jd = json.loads(request.body)
         print(jd)
         User.objects.create(name=jd['name'], email=jd['email'], password=jd['password'])
