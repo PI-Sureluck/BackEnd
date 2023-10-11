@@ -162,7 +162,7 @@ class OddsView(View):
         print(jd)
         site = Site.objects.get(id=jd["site"])
         evento = Event.objects.get(id=jd["event"])
-        Odds.objects.create(odd=jd['odd'], site=site, event=evento)
+        Odds.objects.create(odd=jd['odd'], site=site, event=evento, team=jd['team'])
         data = {'status': 200, 'message': 'Odd criado com sucesso'}
         return JsonResponse(data)
 
@@ -180,6 +180,9 @@ class OddsView(View):
             if (jd['event'] != ""):
                 evento = Event.objects.get(id=jd["event"])
                 oddsedit.event = evento
+            if (jd['event'] != ""):
+                evento = Event.objects.get(id=jd["team"])
+                oddsedit.team = evento
 
             oddsedit.save()
             data = {'status': 200, 'message': 'Odds editada com sucesso'}

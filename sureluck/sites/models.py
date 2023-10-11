@@ -24,6 +24,7 @@ class Event(models.Model):
 
 class Odds(models.Model):
     odd = models.FloatField()
+    team = models.CharField(max_length=50)
     site = models.ForeignKey(Site, on_delete=models.CASCADE, related_name="odds")
     event = models.ForeignKey(Event,on_delete=models.CASCADE, related_name="odds")
 
