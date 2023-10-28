@@ -252,7 +252,7 @@ class SureBetsView(View):
             for surebet in surebets:
                 Porcent = Calculadora.verificarValorApostar(self, surebet.oddA.odd, surebet.oddB.odd)
                 surebet_info = {
-                    'Id' : surebet.id,
+                    'Id': surebet.id,
                     'TimeA': {
                         "Time": surebet.oddA.team,
                         "Odd": surebet.oddA.odd,
