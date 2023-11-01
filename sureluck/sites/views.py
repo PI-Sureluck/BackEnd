@@ -212,7 +212,7 @@ class SureBetsView(View):
         if id > 0:
             try:
                 surebet = SureBets.objects.get(id=id)
-                Porcent = Calculadora.verificarValorApostar(self,surebet.oddA.odd, surebet.oddB.odd)
+                Porcent = Calculadora.verificarValorApostar(self, surebet.oddA.odd, surebet.oddB.odd)
                 surebet_info = {
                     'Id': surebet.id,
                     'TimeA': {
@@ -350,3 +350,64 @@ class SureBetsView(View):
             data = {'status': 404, 'message': 'não foi possivel encontrar a Surebets'}
 
         return JsonResponse(data)
+
+
+class ScrepView(View):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, id=0):
+        events = Event.objects.all()  # Recupera todos os eventos
+        event_data = []  # Lista para armazenar os dados dos eventos e suas odds
+
+        for event in events:
+            odds_do_event = Odds.objects.filter(event=event)
+            event_odds = {
+                "event_name": event.name,
+                "teamA": [],
+                "teamB": [],
+                "surebets": []
+            }
+
+            for odds in odds_do_event:
+                if event.teamA == odds.team:
+                    event_odds["teamA"].append({
+                        'team': odds.team,
+                        'odd': odds.odd,
+                        'site': odds.site.name
+                    })
+                else:
+                    event_odds["teamB"].append({
+                        'team': odds.team,
+                        'odd': odds.odd,
+                        'site': odds.site.name
+                    })
+
+            for teamA in event_odds["teamA"]:
+                for teamB in event_odds["teamB"]:
+                    is_surebet = Calculadora.verificarSureBets(0, teamA['odd'], teamB['odd'])
+                    if is_surebet == 1:
+                        event_odds["surebets"].append({
+                            'teamA': teamA['team'],
+                            'teamB': teamB['team'],
+                            'odd_teamA': teamA['odd'],
+                            'odd_teamB': teamB['odd']
+                        })
+                        oddA = Odds.objects.get(odd=teamA['odd'], team=teamA['team'], site__name=teamA['site'],
+                                                event=event)
+                        oddB = Odds.objects.get(odd=teamB['odd'], team=teamB['team'], site__name=teamB['site'],
+                                                event=event)
+                        # Crie uma instância do modelo SureBets e associe as instâncias de Odds
+                        SureBets.objects.create(
+                            teamA=oddA.team,
+                            teamB=oddB.team,
+                            oddA=oddA,
+                            oddB=oddB,
+                            profit=0
+                        )
+
+
+
+        return JsonResponse({'status': 200})

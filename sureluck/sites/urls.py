@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import SiteView, EventView, OddsView, SureBetsView
+from .views import SiteView, EventView, OddsView, SureBetsView, ScrepView
 
 urlpatterns = [
     path('site/', SiteView.as_view(), name='site_list'),
@@ -14,4 +14,6 @@ urlpatterns = [
 
     path('surebets/', SureBetsView.as_view(), name='surebets_list'),
     path('surebets/<int:id>', SureBetsView.as_view(), name='surebets_process'),
+
+    path('scrap/', ScrepView.as_view(), name='scrap'),
 ]
