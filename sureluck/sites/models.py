@@ -28,13 +28,19 @@ class Odds(models.Model):
     site = models.ForeignKey(Site, on_delete=models.CASCADE, related_name="odds")
     event = models.ForeignKey(Event,on_delete=models.CASCADE, related_name="odds")
 
+    def __str__(self):
+        return f"{self.team} - ODD: {self.odd}"
+
 
 class SureBets(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
     teamA = models.CharField(max_length=50)
     teamB = models.CharField(max_length=50)
-    oddA = models.FloatField()
-    oddB = models.FloatField()
+    oddA = models.ForeignKey(Odds,on_delete=models.CASCADE, related_name="odds_a")
+    oddB = models.ForeignKey(Odds,on_delete=models.CASCADE, related_name="odds_b")
     profit = models.FloatField()
-    site = models.ManyToManyField(Site, related_name="sites")
-    event = models.ManyToManyField(Event, related_name="events")
+
+    def __str__(self):
+        return f"{self.teamA} X {self.teamB}"
+
 

@@ -1,8 +1,10 @@
 import json
 
+from django.utils import timezone
 from django.utils.dateparse import parse_date
 from rest_framework import viewsets
-
+from .Utilitarios.Calculadora import Calculadora
+from .Utilitarios.webscraping import WebScraping
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -136,6 +138,7 @@ class EventView(View):
 
         return JsonResponse(data)
 
+
 class OddsView(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -201,85 +204,228 @@ class OddsView(View):
 
         return JsonResponse(data)
 
+
 class SureBetsView(View):
-        @method_decorator(csrf_exempt)
-        def dispatch(self, request, *args, **kwargs):
-            return super().dispatch(request, *args, **kwargs)
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
-        def get(self, request, id=0):
-            if (id > 0):
-                surebet = list(SureBets.objects.filter(id=id).values())
-                if (len(surebet) > 0):
-                    data = {'status': 200, 'message': 'SureBets encontrado', 'surebet': surebet}
+    def get(self, request, id=0):
+        if id > 0:
+            try:
+                surebet = SureBets.objects.get(id=id)
+                Porcent = Calculadora.verificarValorApostar(self, surebet.oddA.odd, surebet.oddB.odd)
+                surebet_info = {
+                    'Id': surebet.id,
+                    'TimeA': {
+                        "Time": surebet.oddA.team,
+                        "Odd": surebet.oddA.odd,
+                        "Site": {
+                            "Name": surebet.oddA.site.name,
+                            "Link": surebet.oddA.site.link
+                        },
+                        "Event": {
+                            "Name": surebet.oddA.event.name,
+                            "Date": surebet.oddA.event.date
+                        },
+                        "Porcent": Porcent[0]
+                    },
+                    'TimeB': {
+                        "Time": surebet.oddB.team,
+                        "Odd": surebet.oddB.odd,
+                        "Site": {
+                            "Name": surebet.oddB.site.name,
+                            "Link": surebet.oddB.site.link
+                        },
+                        "Event": {
+                            "Name": surebet.oddB.event.name,
+                            "Date": surebet.oddB.event.date
+                        },
+                        "Porcent": Porcent[1]
+                    }
+                }
+                data = {'status': 200, 'message': 'SureBet encontrado', 'surebet': surebet_info}
+            except SureBets.DoesNotExist:
+                data = {'status': 404, 'message': 'Não foi possível encontrar a SureBet com o ID fornecido'}
+        else:
+            surebets = SureBets.objects.all().order_by('-created_at')
+            surebet_info_list = []
+
+            now = timezone.now()
+            limite_tempo = now - timezone.timedelta(minutes=5)
+            SureBets.objects.filter(created_at__lt=limite_tempo).delete()
+
+            for surebet in surebets:
+                Porcent = Calculadora.verificarValorApostar(self, surebet.oddA.odd, surebet.oddB.odd)
+                surebet_info = {
+                    'Id': surebet.id,
+                    'TimeA': {
+                        "Time": surebet.oddA.team,
+                        "Odd": surebet.oddA.odd,
+                        "Site": {
+                            "Name": surebet.oddA.site.name,
+                            "Link": surebet.oddA.site.link
+                        },
+                        "Event": {
+                            "Name": surebet.oddA.event.name,
+                            "Date": surebet.oddA.event.date
+                        },
+                        "Porcent": Porcent[0]
+                    },
+                    'TimeB': {
+                        "Time": surebet.oddB.team,
+                        "Odd": surebet.oddB.odd,
+                        "Site": {
+                            "Name": surebet.oddB.site.name,
+                            "Link": surebet.oddB.site.link
+                        },
+                        "Event": {
+                            "Name": surebet.oddB.event.name,
+                            "Date": surebet.oddB.event.date
+                        },
+                        "Porcent": Porcent[1]
+                    }
+                }
+                surebet_info_list.append(surebet_info)
+
+            if len(surebet_info_list) > 0:
+                data = {'status': 200, 'message': 'SureBets encontrados', 'surebets': surebet_info_list}
+            else:
+                data = {'status': 404, 'message': 'Não foi possível encontrar nenhuma SureBet'}
+
+        return JsonResponse(data)
+
+    def post(self, request):
+        # Lê o JSON do corpo da requisição
+        jd = json.loads(request.body)
+        print(jd)
+        sites = []
+        events = []
+        for item in jd["site"]:
+            print(item)
+            sites.append(Site.objects.get(id=item))
+
+        for item in jd["event"]:
+            print(item)
+            events.append(Event.objects.get(id=item))
+        sure_bet = SureBets.objects.create(
+            teamA=jd['teamA'],
+            teamB=jd['teamB'],
+            oddA=jd['oddA'],
+            oddB=jd['oddB'],
+            profit=jd['profit']
+        )
+        sure_bet.site.set(sites)
+        sure_bet.event.set(events)
+
+        data = {'status': 200, 'message': 'Surebets criado com sucesso'}
+        return JsonResponse(data)
+
+    def put(self, request, id):
+        jd = json.loads(request.body)
+        odds = list(Odds.objects.filter(id=id).values())
+
+        if (len(odds) > 0):
+            surebetsedit = SureBets.objects.get(id=id)
+
+            profit = jd['profit']
+            if (jd['teamA'] != ""):
+                surebetsedit.teamA = jd['teamA']
+            if (jd['teamB'] != ""):
+                surebetsedit.teamB = jd['teamB']
+            if (jd['oddA'] != ""):
+                surebetsedit.oddA = jd['oddA']
+            if (jd['oddB'] != ""):
+                surebetsedit.oddB = jd['oddB']
+            if (jd['profit'] != ""):
+                surebetsedit.profit = jd['profit']
+
+            surebetsedit.save()
+            data = {'status': 200, 'message': 'SureBets editada com sucesso'}
+        else:
+            data = {'status': 404, 'message': 'não foi possivel encontrar a Surebets'}
+
+        return JsonResponse(data)
+
+    def delete(self, request, id):
+        odd = list(SureBets.objects.filter(id=id).values())
+        if (len(odd) > 0):
+            SureBets.objects.filter(id=id).delete()
+            data = {'status': 200, 'message': 'Surebets deletado com sucesso'}
+        else:
+            data = {'status': 404, 'message': 'não foi possivel encontrar a Surebets'}
+
+        return JsonResponse(data)
+
+
+class ScrepView(View):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request):
+        events = Event.objects.all()  # Recupera todos os eventos
+        event_data = []  # Lista para armazenar os dados dos eventos e suas odds
+
+        for event in events:
+            odds_do_event = Odds.objects.filter(event=event)
+            event_odds = {
+                "event_name": event.name,
+                "teamA": [],
+                "teamB": [],
+                "surebets": []
+            }
+
+            for odds in odds_do_event:
+                if event.teamA == odds.team:
+                    event_odds["teamA"].append({
+                        'team': odds.team,
+                        'odd': odds.odd,
+                        'site': odds.site.name
+                    })
                 else:
-                    data = {'status': 404, 'message': 'não foi possivel encontrar o surebet'}
-            else:
-                surebets = list(SureBets.objects.values())
-                if (len(surebets) > 0):
-                    data = {'status': 200, 'message': 'SureBets encontrados', 'surebets': surebets}
-                else:
-                    data = {'status': 404, 'message': 'não foi possivel encontrar nenhuma surebet'}
-            return JsonResponse(data)
+                    event_odds["teamB"].append({
+                        'team': odds.team,
+                        'odd': odds.odd,
+                        'site': odds.site.name
+                    })
 
-        def post(self, request):
-            # Lê o JSON do corpo da requisição
-            jd = json.loads(request.body)
-            print(jd)
-            sites = []
-            events = []
-            for item in jd["site"]:
-                print(item)
-                sites.append(Site.objects.get(id=item))
-
-            for item in jd["event"]:
-                print(item)
-                events.append(Event.objects.get(id=item))
-            sure_bet = SureBets.objects.create(
-                teamA=jd['teamA'],
-                teamB=jd['teamB'],
-                oddA=jd['oddA'],
-                oddB=jd['oddB'],
-                profit=jd['profit']
-            )
-            sure_bet.site.set(sites)
-            sure_bet.event.set(events)
-
-            data = {'status': 200, 'message': 'Surebets criado com sucesso'}
-            return JsonResponse(data)
-
-        def put(self, request, id):
-            jd = json.loads(request.body)
-            odds = list(Odds.objects.filter(id=id).values())
-
-            if (len(odds) > 0):
-                surebetsedit = SureBets.objects.get(id=id)
+            for teamA in event_odds["teamA"]:
+                for teamB in event_odds["teamB"]:
+                    is_surebet = Calculadora.verificarSureBets(0, teamA['odd'], teamB['odd'])
+                    if is_surebet == 1:
+                        event_odds["surebets"].append({
+                            'teamA': teamA['team'],
+                            'teamB': teamB['team'],
+                            'odd_teamA': teamA['odd'],
+                            'odd_teamB': teamB['odd']
+                        })
+                        oddA = Odds.objects.get(odd=teamA['odd'], team=teamA['team'], site__name=teamA['site'],
+                                                event=event)
+                        oddB = Odds.objects.get(odd=teamB['odd'], team=teamB['team'], site__name=teamB['site'],
+                                                event=event)
+                        # Crie uma instância do modelo SureBets e associe as instâncias de Odds
+                        SureBets.objects.create(
+                            teamA=oddA.team,
+                            teamB=oddB.team,
+                            oddA=oddA,
+                            oddB=oddB,
+                            profit=0
+                        )
 
 
-                profit=jd['profit']
-                if (jd['teamA'] != ""):
-                    surebetsedit.teamA=jd['teamA']
-                if (jd['teamB'] != ""):
-                    surebetsedit.teamB=jd['teamB']
-                if (jd['oddA'] != ""):
-                    surebetsedit.oddA=jd['oddA']
-                if (jd['oddB'] != ""):
-                    surebetsedit.oddB=jd['oddB']
-                if (jd['profit'] != ""):
-                    surebetsedit.profit=jd['profit']
 
-                surebetsedit.save()
-                data = {'status': 200, 'message': 'SureBets editada com sucesso'}
-            else:
-                data = {'status': 404, 'message': 'não foi possivel encontrar a Surebets'}
+        return JsonResponse({'status': 200})
 
-            return JsonResponse(data)
 
-        def delete(self, request, id):
-            odd = list(SureBets.objects.filter(id=id).values())
-            if (len(odd) > 0):
-                SureBets.objects.filter(id=id).delete()
-                data = {'status': 200, 'message': 'Surebets deletado com sucesso'}
-            else:
-                data = {'status': 404, 'message': 'não foi possivel encontrar a Surebets'}
+class ScrapView(View):
 
-            return JsonResponse(data)
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, id=0):
+        WebScraping.webscraping(0)
+        response = ScrepView.as_view()(request)
+        return JsonResponse({'status': 200})
