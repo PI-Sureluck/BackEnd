@@ -22,11 +22,11 @@ class WebScraping:
         for game in games:
             divs = game.find_elements('tag name', 'div')
 
-            namesite = divs[0].find_element('tag name', 'a').find_element('tag name', 'img').get_attribute('title')
-            timeA = divs[1].text
-            oddA = divs[2].text
-            oddB = divs[3].text
-            timeB = divs[4].text
+            namesite = divs[0].find_element('tag name', 'a').find_element('tag name', 'img').get_attribute('title').replace(" ", "").upper()
+            timeA = (divs[1].text).replace("Esports", "").replace(" ", "").upper()
+            oddA = (divs[2].text)
+            oddB = (divs[3].text)
+            timeB = (divs[4].text).replace("Esports", "").replace(" ", "").upper()
 
             nameevent = f"{timeA}vs{timeB}"
             site, created = Site.objects.get_or_create(name=namesite,defaults={'link': 'None', 'logo': 'None', 'xpath': 'None'})

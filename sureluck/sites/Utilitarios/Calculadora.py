@@ -11,5 +11,4 @@ class Calculadora:
         res2 = (1 / res) * 100
         timeA = (1 / OddtimeA) * res2
         timeB = (1 / OddtimeB) * res2
-        print(timeA, timeB)
         return [timeA, timeB]

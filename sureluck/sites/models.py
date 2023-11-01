@@ -29,7 +29,7 @@ class Odds(models.Model):
     event = models.ForeignKey(Event,on_delete=models.CASCADE, related_name="odds")
 
     def __str__(self):
-        return f"{self.team} - ODD: {self.odd}"
+        return f"{self.odd}"
 
 
 class SureBets(models.Model):
