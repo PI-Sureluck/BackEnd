@@ -33,6 +33,7 @@ class Odds(models.Model):
 
 
 class SureBets(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
     teamA = models.CharField(max_length=50)
     teamB = models.CharField(max_length=50)
     oddA = models.ForeignKey(Odds,on_delete=models.CASCADE, related_name="odds_a")

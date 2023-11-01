@@ -1,8 +1,10 @@
 import json
 
+from django.utils import timezone
 from django.utils.dateparse import parse_date
 from rest_framework import viewsets
 from .Utilitarios.Calculadora import Calculadora
+from .Utilitarios.webscraping import WebScraping
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -246,8 +248,12 @@ class SureBetsView(View):
             except SureBets.DoesNotExist:
                 data = {'status': 404, 'message': 'Não foi possível encontrar a SureBet com o ID fornecido'}
         else:
-            surebets = SureBets.objects.all()
+            surebets = SureBets.objects.all().order_by('-created_at')
             surebet_info_list = []
+
+            now = timezone.now()
+            limite_tempo = now - timezone.timedelta(minutes=5)
+            SureBets.objects.filter(created_at__lt=limite_tempo).delete()
 
             for surebet in surebets:
                 Porcent = Calculadora.verificarValorApostar(self, surebet.oddA.odd, surebet.oddB.odd)
@@ -358,7 +364,7 @@ class ScrepView(View):
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
-    def get(self, request, id=0):
+    def get(self, request):
         events = Event.objects.all()  # Recupera todos os eventos
         event_data = []  # Lista para armazenar os dados dos eventos e suas odds
 
@@ -410,4 +416,16 @@ class ScrepView(View):
 
 
 
+        return JsonResponse({'status': 200})
+
+
+class ScrapView(View):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, id=0):
+        WebScraping.webscraping(0)
+        response = ScrepView.as_view()(request)
         return JsonResponse({'status': 200})
