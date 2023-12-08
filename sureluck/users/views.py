@@ -88,30 +88,45 @@ class LoginView(APIView):
 
 
 class UserView(APIView):
+    def get(self, request):
+        # Recupera o cabeçalho de autorização da requisição
+        auth_header = request.headers.get('Authorization')
 
-    def get(self,request):
-        token = request.COOKIES.get('jwt')
+        # Verifica se o cabeçalho de autorização existe e contém o prefixo "Bearer"
+        if not auth_header or not auth_header.startswith('Bearer '):
+            raise AuthenticationFailed('Token não encontrado ou formato inválido')
 
-        if not token:
-            raise AuthenticationFailed('Algo deu errado')
+        # Extrai o token JWT removendo o prefixo "Bearer "
+        token = auth_header[len('Bearer '):]
+        print(token)
 
         try:
+            # Decodifica o token JWT usando a chave secreta
             payload = jwt.decode(token, 'secret', algorithms=['HS256'])
         except jwt.ExpiredSignatureError:
-            raise AuthenticationFailed('Algo deu errado')
+            raise AuthenticationFailed('Token expirado')
+        except jwt.InvalidTokenError:
+            raise AuthenticationFailed('Token inválido')
 
-        user = User.objects.filter(id=payload['id']).first()
+        # Agora você pode usar o payload para obter informações do usuário, se necessário
+        user_id = payload.get('id')
+
+        # Exemplo: recupera o usuário com base no ID do payload
+        user = User.objects.filter(id=user_id).first()
+
+        # Se desejar, você pode serializar as informações do usuário
         serializer = UserSerializer(user)
-        return Response(serializer.data)
+
+        # Retorna as informações do usuário no formato desejado
+        return Response({'user': serializer.data, 'auth': {'admin': user.admin, 'premio': user.premio}})
+
 
 
 class LogoutView(APIView):
     def post(self, request):
         response = Response()
         response.delete_cookie("jwt")
-        response.data = {
-            'message' : 'success'
-        }
+        response.data = {'message': 'logout bem-sucedido'}
         return response
 
 
