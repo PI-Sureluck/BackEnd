@@ -251,10 +251,10 @@ class SureBetsView(View):
             surebets = SureBets.objects.all().order_by('-created_at')
             surebet_info_list = []
 
-            #now = timezone.now()
-            #limite_tempo = now - timezone.timedelta(minutes=5)
-            #print(limite_tempo)
-            #SureBets.objects.filter(created_at__lt=limite_tempo).delete()
+            now = timezone.now()
+            limite_tempo = now - timezone.timedelta(minutes=5)
+            print(limite_tempo)
+            SureBets.objects.filter(created_at__lt=limite_tempo).delete()
 
             for surebet in surebets:
                 Porcent = Calculadora.verificarValorApostar(self, surebet.oddA.odd, surebet.oddB.odd)
@@ -427,6 +427,6 @@ class ScrapView(View):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, id=0):
-        WebScraping.webscraping(1)
+        WebScraping.webscraping(0)
         response = ScrepView.as_view()(request)
         return JsonResponse({'status': 200})

@@ -3,15 +3,19 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
+from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.firefox.service import Service
+from webdriver_manager.firefox import GeckoDriverManager
 from ..models import *
-
+import time
 
 class WebScraping:
     def webscraping(self):
         options = Options()
-        #options.add_argument("--headless")
+        options.add_argument("--headless")
 
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+        #driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+        driver = webdriver.Firefox(service=Service(GeckoDriverManager().install()), options=options)
 
         driver.get("https://pt.egamersworld.com/bets")
         print(driver.find_element('xpath', '/html/body/noscript').text)
