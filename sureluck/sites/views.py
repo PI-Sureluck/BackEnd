@@ -427,6 +427,6 @@ class ScrapView(View):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, id=0):
-        WebScraping.webscraping(0)
+        WebScraping.webscraping(1)
         response = ScrepView.as_view()(request)
         return JsonResponse({'status': 200})
