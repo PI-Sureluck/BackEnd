@@ -43,7 +43,6 @@ class Register(APIView):
         except User.DoesNotExist:
             return Response({"error": "Usuário não encontrado"}, status=status.HTTP_404_NOT_FOUND)
 
-
         serializer = UserSerializer(user, data=request.data,partial=True)  # Use partial=True para permitir atualizações parciais
         serializer.is_valid(raise_exception=True)
         serializer.save()
